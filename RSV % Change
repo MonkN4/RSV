@@ -23,7 +23,6 @@ else if (n_option == "13")
 else
     n := 10
 
-
 pct_change_main = (close - close[n]) / close[n] * 100
 DXY_pct_change = (DXY - DXY[n]) / DXY[n] * 100
 IR_pct_change = (IR - IR[n]) / IR[n] * 100 
