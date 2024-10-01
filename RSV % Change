@@ -4,30 +4,27 @@
 //@version=5
 indicator("Monk RSV % Change")
 
-// Grab symbol 
 DXY = request.security("DX1!", "1D", close)
-IR = request.security("ZB1!", "1D", close)
+IR = request.security("ZF1!", "1D", close)
 GOLD = request.security("GC1!", "1D", close)
 BTC = request.security("BTC1!", "1D", close)
 
-//Percentage Change 
+Length = input.string(defval="10", title="Length", options=["10", "13", "30"])
 
-n = input.int(defval = 10, title = " Custom Length ")
+NumericLength = 10
 
-n_option = input.string(defval="10", title="Length", options=["10", "13", "30"])
-
-if (n_option == "30")
-    n := 30
-else if (n_option == "13")
-    n := 13
+if (Length == "30")
+    NumericLength := 30
+else if (Length == "13")
+    NumericLength := 13
 else
-    n := 10
+    NumericLength := 10
 
-pct_change_main = (close - close[n]) / close[n] * 100
-DXY_pct_change = (DXY - DXY[n]) / DXY[n] * 100
-IR_pct_change = (IR - IR[n]) / IR[n] * 100 
-GOLD_pct_change = (GOLD - GOLD[n]) / GOLD[n] * 100 
-BTC_pct_change = (BTC - BTC[n]) / BTC[n] * 100 
+pct_change_main = (close - close[NumericLength]) / close[NumericLength] * 100
+DXY_pct_change = (DXY - DXY[NumericLength]) / DXY[NumericLength] * 100
+IR_pct_change = (IR - IR[NumericLength]) / IR[NumericLength] * 100 
+GOLD_pct_change = (GOLD - GOLD[NumericLength]) / GOLD[NumericLength] * 100 
+BTC_pct_change = (BTC - BTC[NumericLength]) / BTC[NumericLength] * 100 
 
 DXY_Spread = pct_change_main - DXY_pct_change
 IR_Spread = pct_change_main - IR_pct_change
@@ -36,7 +33,6 @@ BTC_Spread = pct_change_main - BTC_pct_change
 
 Lookback = input.int(defval = 100, title = " lookback ")
 
-// Highest and Lowest Values
 HighestSpread = ta.highest(DXY_Spread, Lookback)
 LowestSpread = ta.lowest(DXY_Spread, Lookback)
 HighestSpread_IR = ta.highest(IR_Spread, Lookback)
@@ -46,30 +42,26 @@ LowestGOLD = ta.lowest(GOLD_Spread, Lookback)
 HighestBTC = ta.highest(BTC_Spread, Lookback)
 LowestBTC = ta.lowest(BTC_Spread, Lookback)
 
-// Calculate RSV (0 to 100)
 RSV = ((DXY_Spread - LowestSpread) / (HighestSpread - LowestSpread)) * 100
 RSV_IR = ((IR_Spread - LowestSpread_IR) / (HighestSpread_IR - LowestSpread_IR)) * 100
 RSV_G = ((GOLD_Spread - LowestGOLD) / (HighestGOLD - LowestGOLD)) * 100
 RSV_B = ((BTC_Spread - LowestBTC) / (HighestBTC - LowestBTC)) * 100
 
-// Standardize RSV to -100 to +100 (mean = 0)
 RSV_std = (RSV - 50) / 50 * 100
 RSV_IR_std = (RSV_IR - 50) / 50 * 100
 RSV_G_std = (RSV_G - 50) / 50 * 100
 RSV_B_std = (RSV_B - 50) / 50 * 100
 
-// Plot the standardized RSVs
 showRSV = input(true, title="DXY")
 showRSV_IR = input(true, title="Bonds")
 showRSV_G = input(true, title="Gold")
 showBTC = input(true, title="BTC")
 
-RSVplot_std = plot(showRSV ? RSV_std : na, "DXY", color=color.purple, linewidth = 2)
-IRplot_std = plot(showRSV_IR ? RSV_IR_std : na, "Bonds", color=color.blue, linewidth = 2)
-GOLDplot_std = plot(showRSV_G ? RSV_G_std : na, "Gold", color=color.orange, linewidth = 2)
-BTCplot_std = plot(showBTC ? RSV_B_std : na , "BTC", color=color.green, linewidth = 2)
+RSVplot_std = plot(showRSV ? RSV_std : na, "DXY", color=color.purple, linewidth = 2, precision = 3)
+IRplot_std = plot(showRSV_IR ? RSV_IR_std : na, "Bonds", color=color.blue, linewidth = 2, precision = 3)
+GOLDplot_std = plot(showRSV_G ? RSV_G_std : na, "Gold", color=color.orange, linewidth = 2, precision = 3)
+BTCplot_std = plot(showBTC ? RSV_B_std : na , "BTC", color=color.green, linewidth = 2, precision = 3)
 
-// Midline and levels
 Midline = hline(0, editable = true, linewidth = 1, color=color.rgb(179, 179, 179), title = "Mid-line", linestyle=hline.style_solid)
 overvalued_level = input.float(75, title="Overvalued")
 undervalued_level = input.float(-75, title="Undervalued")
